@@ -1,0 +1,13 @@
+
+server:
+  port: PORT
+
+spotify:
+  clientId: SPOTIFY_CLIENT_ID
+  clientSecret: SPOTIFY_CLIENT_SECRET
+  redirectUri: SPOTIFY_REDIRECT_URI
+  playlistUser: SPOTIFY_PLAYLIST_USER
+  targetPlaylist: SPOTIFY_TARGET_PLAYLIST
+
+slack:
+  token: SLACK_TOKEN

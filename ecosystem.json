@@ -1,0 +1,24 @@
+{
+  "apps" : [
+    {
+      "name"  : "taptapboom-box",
+      "script"    : "app.js",
+      "env": {
+        "COMMON_VARIABLE": "true"
+      },
+      "env_production" : {
+        "NODE_ENV": "production"
+      }
+    }
+  ],
+  "deploy" : {
+    "production" : {
+      "user" : "ubuntu",
+      "host" : "139.59.43.195",
+      "ref" : "origin/master",
+      "repo" : "git@github.com:repo.git",
+      "path" : "/home/ubuntu/taptapboom-box",
+      "post-deploy" : "npm install && pm2 startOrRestart ecosystem.json --env production"
+    }
+  }
+}
