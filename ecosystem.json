@@ -11,7 +11,7 @@
       "host" : "139.59.43.195",
       "ref" : "origin/master",
       "repo" : "git@github.com:NwinWorks/taptapboom.audio.git",
-      "path" : "/home/ubuntu/taptapboom-box",
+      "path" : "/home/ubuntu/taptapboom.audio",
       "post-deploy" : "${HOME}/run.sh"
     }
   }
