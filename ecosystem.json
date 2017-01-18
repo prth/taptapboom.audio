@@ -10,7 +10,7 @@
       "user" : "ubuntu",
       "host" : "139.59.43.195",
       "ref" : "origin/master",
-      "repo" : "git@github.com:NwinWorks/taptapboom-box.git",
+      "repo" : "git@github.com:NwinWorks/taptapboom.audio.git",
       "path" : "/home/ubuntu/taptapboom-box",
       "post-deploy" : "${HOME}/run.sh"
     }
