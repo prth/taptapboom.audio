@@ -16,7 +16,7 @@
       "user" : "ubuntu",
       "host" : "139.59.43.195",
       "ref" : "origin/master",
-      "repo" : "git@github.com:repo.git",
+      "repo" : "git@github.com:NwinWorks/taptapboom-box.git",
       "path" : "/home/ubuntu/taptapboom-box",
       "post-deploy" : "npm install && pm2 startOrRestart ecosystem.json --env production"
     }
