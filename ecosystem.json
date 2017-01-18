@@ -1,7 +1,7 @@
 {
   "apps" : [
     {
-      "name"  : "taptapboom-box",
+      "name"  : "taptapboom.audio",
       "script"    : "index.js"
     }
   ],
