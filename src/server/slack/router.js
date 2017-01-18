@@ -12,7 +12,7 @@ const router = express.Router({ mergeParams: true })
 
 router.use(Controller.authorizeSlack)
 
-router.post('', (req, res) => {
+router.post('/command', (req, res) => {
   return co(function* () {
 
     const text = _.get(req, 'body.text')

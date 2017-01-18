@@ -18,12 +18,19 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(morgan('dev'))
 
-app.use('', AuthorizationRouter)
-app.use('/admin', AdminRouter)
-app.use('/slack', SlackRouter)
+app.use('/api/auth', AuthorizationRouter)
+app.use('/api/admin', AdminRouter)
+app.use('/api/slack', SlackRouter)
 
 const port = config.get('server.port')
-app.listen(port)
-Logger.info(`ExpressJS server running on port: ${port}`)
 
-module.exports = app
+function init() {
+  app.listen(port)
+  Logger.info(`ExpressJS server running on port: ${port}`)
+
+  return app
+}
+
+module.exports = {
+  init
+}

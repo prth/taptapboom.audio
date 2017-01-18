@@ -10,4 +10,7 @@ spotify:
   targetPlaylist: SPOTIFY_TARGET_PLAYLIST
 
 slack:
-  token: SLACK_TOKEN
+  clientId: SLACK_CLIENT_ID
+  clientSecret: SLACK_CLIENT_SECRET
+  verificationToken: SLACK_VERIFICATION_TOKEN
+  oAuthState: SLACK_OAUTH_STATE
