@@ -21,8 +21,8 @@ router.get('/callback', (req, res) => {
       uri: 'https://slack.com/api/oauth.access',
       query: {
         code,
-        client_id: condig.get('slack.clientId'),
-        client_secret: condig.get('slack.clientSecret')
+        client_id: config.get('slack.clientId'),
+        client_secret: config.get('slack.clientSecret')
       }
     }
 
