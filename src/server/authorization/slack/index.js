@@ -19,7 +19,7 @@ router.get('/callback', (req, res) => {
 
     const options = {
       uri: 'https://slack.com/api/oauth.access',
-      query: {
+      qs: {
         code,
         client_id: config.get('slack.clientId'),
         client_secret: config.get('slack.clientSecret')
