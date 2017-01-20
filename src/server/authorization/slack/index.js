@@ -5,7 +5,8 @@ const _ = require('lodash')
 const co = require('bluebird').coroutine
 const request = require('request-promise')
 const config = require('config')
-const Redis = require('db/redis')
+
+const Redis = require('src/db/redis')
 
 const router = express.Router({ mergeParams: true })
 
@@ -14,8 +15,11 @@ router.get('/callback', (req, res) => {
   co(function* () {
 
     const code = req.query.code
-    // TODO: Verify if state received is the state passed via button.
     const state = req.query.state
+
+    if (state !== config.get('slack.oAuthState')) {
+      throw new Error(`Received state: ${state} does not match configured state.`)
+    }
 
     const options = {
       uri: 'https://slack.com/api/oauth.access',

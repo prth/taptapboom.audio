@@ -2,6 +2,8 @@
 
 const _ = require('lodash')
 
+const Constants = require('src/constants')
+
 function serializeSearchResults(query, results) {
 
   const attachments = _.map(
@@ -13,29 +15,32 @@ function serializeSearchResults(query, results) {
 
       return {
         color: _getRandomColor(),
-        author_name: artists,
         thumb_url: i.album.images[0].url,
 
-        title: i.name,
+        title: `${i.name} - ${artists}`,
         title_link: i.external_urls.spotify,
 
-        text: `ID --> ${i.id}`
+        callback_id: Constants.SLACK.INTERACTIVE.SONG_SEARCH.CALLBACK_ID,
+        actions: [
+          {
+            name: Constants.SLACK.INTERACTIVE.SONG_SEARCH.ACTION.ADD_SONG.NAME,
+            text: Constants.SLACK.INTERACTIVE.SONG_SEARCH.ACTION.ADD_SONG.TEXT,
+            type: 'button',
+            value: i.id
+          }
+        ]
       }
     }
   )
     .slice(0, 5)
 
-  let text = `Here's what we found for: _${query}_`
+  let text = `Here's what we found for: *${query}*`
 
   if (!attachments.length) {
-    text = `Sorry, mate. We couldn't find any results for that :\\`
+    text = `Sorry. We couldn't find any results for that 😞` // :disappointed: emoji
   }
 
-  return {
-    response_type: 'in_channel',
-    text,
-    attachments
-  }
+  return { response_type: 'in_channel', text, attachments }
 }
 
 function _getRandomColor() {

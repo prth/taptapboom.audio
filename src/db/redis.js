@@ -7,7 +7,7 @@ const redis = require('redis')
 Promise.promisifyAll(redis.RedisClient.prototype);
 Promise.promisifyAll(redis.Multi.prototype)
 
-const Logger = require('util/logger')
+const Logger = require('src/util/logger')
 
 const client = redis.createClient()
 
