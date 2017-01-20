@@ -2,16 +2,33 @@
 
 const _ = require('lodash')
 const config = require('config')
+const xform = require('x-www-form-urlencode')
 
 function authorizeSlack(req, res, next) {
 
-  const token = _.get(req, 'body.token')
+  const token = _getTokenFromRequest(req)
 
-  if (!token || token !== config.get('slack.token')) {
+  const doesntMatchEitherToken = (token !== config.get('slack.token') && 
+  token !== config.get('slack.verificationToken'))
+
+  if (!token || doesntMatchEitherToken) {
     return next(new Error('Invalid Slack Token!'))
   }
 
   next()
+}
+
+function _getTokenFromRequest(req) {
+
+  let token = _.get(req, 'body.token')
+
+  if (!token && req.body.payload) {
+    let payload = JSON.parse(xform.decode(req.body.payload))
+    token = _.get(payload, 'token')
+    req.body = payload
+  }
+
+  return token
 }
 
 module.exports = {

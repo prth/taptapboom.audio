@@ -1,12 +1,16 @@
 'use strict'
 
+const debug = require('debug')('controller-slack')
 const express = require('express')
 const _ = require('lodash')
 const request = require('request-promise')
 const co = require('bluebird').coroutine
-const Controller = require('server/slack/controller')
-const Spotify = require('spotify/app')
-const Serializer =  require('server/slack/serializer')
+
+const Logger = require('src/util/logger')
+const Constants = require('src/constants')
+const Controller = require('src/server/slack/controller')
+const Spotify = require('src/spotify/app')
+const Serializer =  require('src/server/slack/serializer')
 
 const router = express.Router({ mergeParams: true })
 
@@ -33,68 +37,58 @@ router.post('/command', (req, res) => {
       case 'add':
         return _searchMusicFromSpotify(req.body, query, res)
 
-      case 'play':
-        return _addMusicToPlaylist(req.body, query, res)
-
       case 'nowplaying':
         return res.send('l')
 
       default:
-        return res.json({
-          text: `We don't support that yet.`
-        })
+        return res.json({ text: `We don't support that yet.` })
     }
   })()
 })
 
-function _searchMusicFromSpotify(req, query, res) {
+router.post('/interactive', (req, res) => {
+
+  return co(function* () {
+    const callbackId = req.body.callback_id
+
+    switch (callbackId) {
+      case Constants.SLACK.INTERACTIVE.SONG_SEARCH.CALLBACK_ID:
+
+        debug(`CallbackId received: ${Constants.SLACK.INTERACTIVE.SONG_SEARCH.CALLBACK_ID}`)
+
+        const action = _.get(req, 'body.actions')[0]
+        debug(`Action received: ${JSON.stringify(action)}`)
+        const trackId = action.value
+        const track = yield Spotify.getTrackFromId(trackId)
+        const trackName = track.name
+
+        res.send({ text: Constants.MESSAGING.WAIT_FOR_IT })
+
+        const result = yield Spotify.addTrackToTargetPlaylist(trackId)
+
+        if (result.status !== Constants.RESULT.STATUS.SUCCESS) {
+          return { text: Constants.MESSAGING.UH_OH }
+        }
+
+        return { text: Constants.MESSAGING.SPOTIFY.getSONG_SUCCESSFULLY_ADDED(trackName) }
+
+      default:
+        Logger.error(`Unsupported callbackId received: ${callbackId}.`)
+        return { text: Constants.MESSAGING.UH_OH }
+    }
+  })()
+    .then(res => request({ uri: req.body.response_url, method: 'POST', json: res }))
+})
+
+function _searchMusicFromSpotify(requestBody, query, res) {
   return co(function* () {
 
-    res.send({
-      text: `Wait for it...`
-    })
+    res.json({ text: Constants.MESSAGING.WAIT_FOR_IT })
 
     const results = yield Spotify.search(query)
     const serialized = Serializer.serializeSearchResults(query, results.items)
 
-    yield request({
-      uri: req.response_url,
-      method: 'POST',
-      json: serialized
-    })
-
-    if (results.status === 'found') {
-      yield request({
-        uri: req.response_url,
-        method: 'POST',
-        json: {
-          text: `Reply with \`/taptapboom-box play {{id}}\` where the id is from one of the songs.`
-        }
-      })
-    }
-  })()
-}
-
-function _addMusicToPlaylist(req, query, res) {
-  return co(function* () {
-
-    res.json({
-      text: `Wait for it...`
-    })
-
-    const trackId = query.split(' ')[0]
-
-    const result = yield Spotify.addTrackToTargetPlaylist(trackId)
-
-    if (result.result === 'success') {
-      yield request({
-        uri: req.response_url,
-        method: 'POST',
-        json: {
-          text: `Track added to playlist. Type \`/taptapboom-box nowplaying\` to see the currently playing song.`
-        }
-      }) 
-    }
+    yield request({ uri: requestBody.response_url, method: 'POST', json: serialized })
   })()
 }
 
