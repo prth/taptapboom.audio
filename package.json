@@ -4,7 +4,8 @@
   "description": "A Slack-driven interface for Spotify.",
   "main": "index.js",
   "scripts": {
-    "test": "ava"
+    "test": "NODE_PATH=$NODE_PATH:./ nyc ava && npm run report",
+    "report": "nyc report --reporter=html"
   },
   "author": "Shaun",
   "license": "ISC",
@@ -28,6 +29,8 @@
     "x-www-form-urlencode": "0.1.1"
   },
   "devDependencies": {
-    "ava": "^0.17.0"
+    "ava": "0.17.0",
+    "chai": "3.5.0",
+    "nyc": "10.1.2"
   }
 }
