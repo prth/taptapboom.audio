@@ -7,10 +7,10 @@ const request = require('request-promise')
 const co = require('bluebird').coroutine
 
 const Logger = require('src/util/logger')
+const Commands = require('src/server/slack/commands')
 const Constants = require('src/constants')
 const Controller = require('src/server/slack/controller')
 const Spotify = require('src/spotify/app')
-const Serializer =  require('src/server/slack/serializer')
 
 const router = express.Router({ mergeParams: true })
 
@@ -25,25 +25,19 @@ router.post('/command', (req, res) => {
     const command = tokens.shift()
     const query = tokens.join(' ')
 
-    switch (command) {
-      case 'ping':
-        return res.json({
-          text: 'pong'
-        })
-
-      case 'help':
-        return _displayHelp(req.body, query, res)
-
-      case 'add':
-        return _searchMusicFromSpotify(req.body, query, res)
-
-      case 'nowplaying':
-        return res.send('l')
-
-      default:
-        return res.json({ text: `We don't support that yet.` })
+    if (command === 'help' && !query) {
+      return _getHelpText(Commands)
     }
+
+    if (Commands[command]) {
+      return Commands[command].execute(query, req.body.response_url)
+    }
+
+    return `We don't support that yet.`
   })()
+    .then(result => {
+      res.json({ text: result })
+    })
 })
 
 router.post('/interactive', (req, res) => {
@@ -80,22 +74,30 @@ router.post('/interactive', (req, res) => {
     .then(res => request({ uri: req.body.response_url, method: 'POST', json: res }))
 })
 
-function _searchMusicFromSpotify(requestBody, query, res) {
-  return co(function* () {
+let helpText
 
-    res.json({ text: Constants.MESSAGING.WAIT_FOR_IT })
+function _getHelpText(commands) {
 
-    const results = yield Spotify.search(query)
-    const serialized = Serializer.serializeSearchResults(query, results.items)
+  // if help text response is available in cache, return it
+  if (helpText) {
+    return helpText
+  }
 
-    yield request({ uri: requestBody.response_url, method: 'POST', json: serialized })
-  })()
-}
+  const texts = []
 
-function _displayHelp(req, query, res) {
-  res.json({
-    text: 'massive'
-  })
+  for (let commandKey of _.keys(commands)) {
+    const command = commands[commandKey]
+
+    // add help text in the format: "`bot command input` text explaining what it does"
+    texts.push(`\`/${Constants.BOT_NAME} ${command.getSampleInput()}\` ${command.getHelpText()}`)
+  }
+
+  texts.push(`\`/${Constants.BOT_NAME} help\` Lists available commands.`)
+
+  // cache the help text response
+  helpText = texts.sort().join('\n')
+
+  return helpText
 }
 
 module.exports = router

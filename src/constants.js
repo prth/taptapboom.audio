@@ -1,6 +1,8 @@
 'use strict'
 
 module.exports = {
+  BOT_NAME: 'taptapboom',
+
   MESSAGING: {
     UH_OH: `Uh-oh! Looks like we broke something 😅`, // :sweat_smile: emoji
     WAIT_FOR_IT: `Wait for it...`,
