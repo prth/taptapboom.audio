@@ -4,7 +4,9 @@
   "description": "A Slack-driven interface for Spotify.",
   "main": "index.js",
   "scripts": {
-    "test": "ava"
+    "start": "node index.js",
+    "test": "ava",
+    "docker-test": "bin/test.sh"
   },
   "author": "Shaun",
   "license": "ISC",
