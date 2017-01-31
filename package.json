@@ -4,8 +4,11 @@
   "description": "A Slack-driven interface for Spotify.",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_PATH=$NODE_PATH:./ nyc ava && npm run report",
-    "report": "nyc report --reporter=html"
+    "start": "node index.js",
+    "test": "nyc ava",
+    "coverage-html": "nyc report --reporter=html",
+    "coverage-coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "docker-test": "bin/docker-test.sh"
   },
   "author": "Shaun",
   "license": "ISC",
@@ -31,6 +34,7 @@
   "devDependencies": {
     "ava": "0.17.0",
     "chai": "3.5.0",
+    "coveralls": "2.11.15",
     "ghooks": "2.0.0",
     "nodemon": "1.11.0",
     "nyc": "10.1.2",
